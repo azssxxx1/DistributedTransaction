@@ -39,8 +39,8 @@ public class AtomikosServiceImpl implements AtomikosService {
 			entity.setCallNbr("007");
 			callLogDao.insert(entity);
 			
-			int i = 1 / 0;
-			System.out.println(i);
+			//int i = 1 / 0;
+			//System.out.println(i);
 			
 			TestPO entity2 = new TestPO();
 			entity2.setTestId(testDao.getSequence());
