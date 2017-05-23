@@ -1,0 +1,20 @@
+----------------Source Database       : scott------------------
+CREATE TABLE `call_log` (
+  `call_log_id` varchar(32) NOT NULL COMMENT '测试',
+  `call_log_name` varchar(30) DEFAULT NULL COMMENT '测试',
+  `call_s_time` datetime DEFAULT NULL COMMENT '测试',
+  `call_e_time` datetime DEFAULT NULL COMMENT '调测试',
+  `call_result` varchar(4000) DEFAULT NULL COMMENT '测试',
+  `call_nbr` varchar(20) DEFAULT NULL COMMENT '测试',
+  PRIMARY KEY (`call_log_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='call_log表';
+----------------Source Database       : test------------------
+CREATE TABLE `test` (
+  `test_id` varchar(32) NOT NULL COMMENT '测试',
+  `test_name` varchar(30) DEFAULT NULL COMMENT '测试',
+  `test_s_time` datetime DEFAULT NULL COMMENT '测试',
+  `test_e_time` datetime DEFAULT NULL COMMENT '调测试',
+  `test_result` varchar(4000) DEFAULT NULL COMMENT '测试',
+  `test_nbr` varchar(20) DEFAULT NULL COMMENT '测试',
+  PRIMARY KEY (`test_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='test

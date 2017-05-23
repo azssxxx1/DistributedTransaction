@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC
+	"-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="atomikoscallLogDAO">
+	<resultMap id="callLog_base" type="atomikos.demo.po.CallLogPO">
+		<result property="callLogId"   column="call_log_id"   jdbcType="VARCHAR" />
+		<result property="callLogName" column="call_log_name" jdbcType="VARCHAR" />
+		<result property="callSTime"   column="call_s_time"   jdbcType="TIMESTAMP" />
+		<result property="callETime"   column="call_e_time"   jdbcType="TIMESTAMP" />
+		<result property="callResult"  column="call_result"   jdbcType="VARCHAR" />
+		<result property="callNbr"     column="call_nbr"      jdbcType="VARCHAR" />
+	</resultMap>
+  
+	<insert id="insert" parameterType="java.util.Map">
+    INSERT INTO call_log (
+		<include refid="sql_insert_column_list" />
+    ) VALUES (
+		<include refid="sql_insert_property_list" />
+    )
+	</insert> 
+
+	<sql id="sql_insert_column_list">
+		<trim prefix="" prefixOverrides=",">
+			<if test="entity.callLogId != null">,call_log_id</if>
+			<if test="entity.callLogName != null">,call_log_name</if>
+			<if test="entity.callSTime != null">,call_s_time</if>
+			<if test="entity.callETime != null">,call_e_time</if>
+			<if test="entity.callResult != null">,call_result</if>
+			<if test="entity.callNbr != null">,call_nbr</if>
+		</trim>
+	</sql>
+  
+	<sql id="sql_insert_property_list">
+		<trim prefix="" prefixOverrides=",">
+			<if test="entity.callLogId != null">,#{entity.callLogId , jdbcType=VARCHAR}</if>
+			<if test="entity.callLogName != null">,#{entity.callLogName , jdbcType=VARCHAR}</if>
+			<if test="entity.callSTime != null">,#{entity.callSTime , jdbcType=TIMESTAMP}</if>
+			<if test="entity.callETime != null">,#{entity.callETime , jdbcType=TIMESTAMP}</if>
+			<if test="entity.callResult != null">,#{entity.callResult , jdbcType=VARCHAR}</if>
+			<if test="entity.callNbr != null">,#{entity.callNbr , jdbcType=VARCHAR}</if>
+		</trim>
+	</sql>
+  
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+  
+<beans xmlns="http://www.springframework.org/schema/beans"   
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+	xmlns:context="http://www.springframework.org/schema/context"   
+	xmlns:aop="http://www.springframework.org/schema/aop"   
+	xmlns:tx="http://www.springframework.org/schema/tx"   
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd   
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd   
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">  
+  
+	<description>springJTA</description>  
+	<context:annotation-config />
+  
+	<!-- DAO scan -->
+	<context:component-scan base-package="atomikos.demo.dao.impl" />
+	<context:component-scan base-package="atomikos.demo.service.impl" />
+  
+	<!-- 1.指定Spring配置中用到的属性文件 -->   
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">  
+		<property name="locations">  
+			<list>  
+				<value>classpath:spring/dataSource.properties</value>
+			</list>  
+		</property> 
+	</bean>   
+    
+	<!-- 2.配置数据源 -->  
+	<bean id="dataSourceScott" class="com.atomikos.jdbc.AtomikosDataSourceBean" init-method="init" destroy-method="close">  
+		<property name="uniqueResourceName" value="${scott.uniqueResourceName}"/>  
+		<property name="xaDataSourceClassName" value="${jdbc.driver}"/>  
+		<property name="xaProperties">  
+			<props>  
+				<prop key="url">${scott.url}</prop>  
+				<prop key="user">${scott.username}</prop>  
+				<prop key="password">${scott.password}</prop>  
+			</props>  
+		</property>  
+		<property name="minPoolSize" value="${scott.minPoolSize}" />  
+		<property name="maxPoolSize" value="${scott.maxPoolSize}" />  
+		<property name="borrowConnectionTimeout" value="${scott.borrowConnectionTimeout}" />  
+		<property name="testQuery" value="${scott.testQuery}" />  
+		<property name="maintenanceInterval" value="${scott.maintenanceInterval}" />  
+	</bean> 
+	
+	<bean id="dataSourceTest" class="com.atomikos.jdbc.AtomikosDataSourceBean" init-method="init" destroy-method="close">  
+		<property name="uniqueResourceName" value="${test.uniqueResourceName}"/>  
+		<property name="xaDataSourceClassName" value="${jdbc.driver}"/>  
+		<property name="xaProperties">  
+			<props>  
+				<prop key="url">${test.url}</prop>  
+				<prop key="user">${test.username}</prop>  
+				<prop key="password">${test.password}</prop>  
+			</props>  
+		</property>  
+		<property name="minPoolSize" value="${test.minPoolSize}" />  
+		<property name="maxPoolSize" value="${test.maxPoolSize}" />  
+		<property name="borrowConnectionTimeout" value="${test.borrowConnectionTimeout}" />  
+		<property name="testQuery" value="${test.testQuery}" />  
+		<property name="maintenanceInterval" value="${test.maintenanceInterval}" />  
+	</bean> 
+
+	<!-- 3.sqlsessionFactory -->
+	<bean id="scottSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation">
+			<value>classpath:mybatis/atomikos_demo_scottdb_mybatis-config.xml</value>
+		</property>
+		<property name="dataSource">
+			<ref bean="dataSourceScott" />
+		</property>
+	</bean>
+	<bean id="scottSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+		<constructor-arg ref="scottSqlSessionFactory" />
+	</bean>
+	  
+	<bean id="testSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="mapperLocations" value="classpath*:mybatis/base/mapper-atomikos*.xml" />
+		<property name="dataSource">
+			<ref bean="dataSourceTest" />
+		</property>
+	</bean>
+	<bean id="testSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+		<constructor-arg ref="testSqlSessionFactory" />
+	</bean>
+	  
+	<!-- 4.事务管理器配置 -->
+	<!-- 分布式事务 -->
+	<bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager" 
+		init-method="init" destroy-method="close">   
+		<property name="forceShutdown" value="true"/>   
+	</bean>   
+	<bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.UserTransactionImp">   
+		<property name="transactionTimeout" value="${transaction.timeout}"/>   
+	</bean>  
+	  
+	<!-- JTA事务管理器 -->   
+	<bean id="springTransactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">   
+		<property name="transactionManager" ref="atomikosTransactionManager"/>   
+		<property name="userTransaction"    ref="atomikosUserTransaction"/>   
+	</bean> 
+	
+	<!-- 基于注解的声明式事务 --> 
+	<tx:annotation-driven transaction-manager="springTransactionManager" />
+	
+</beans>  
